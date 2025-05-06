@@ -3,7 +3,7 @@ import { useState } from "react";
 function Square({ value, onSquareClick }) {
   return (
     <button
-      className="bg-white border font-bold border-gray-300 h-12 w-12 m-1 leading-9 text-lg"
+      className="bg-white border font-bold border-gray-300 h-32 w-32 m-1 leading-9 text-5xl"
       onClick={onSquareClick}
     >
       {value}
@@ -14,8 +14,15 @@ function Square({ value, onSquareClick }) {
 const Board = ({ value }) => {
   const [squares, setSquares] = useState(Array(9).fill(null));
   const [xIsNext, setXIsNext] = useState(true);
+  const winner = calculateWinner(squares);
+  let status;
+  if (winner) {
+    status = `Winner :  ${winner}`;
+  } else {
+    status = "Next Player : " + (xIsNext ? "X" : "O");
+  }
   function handleClick(i) {
-    if (squares[i]) {
+    if (squares[i] || calculateWinner(squares)) {
       return;
     }
     const nextSquares = squares.slice();
@@ -30,6 +37,7 @@ const Board = ({ value }) => {
 
   return (
     <>
+      <div className="text-3xl font-bold text-center mb-5 mt-3">{status}</div>
       <div className="flex justify-center">
         <Square value={squares[0]} onSquareClick={() => handleClick(0)} />
         <Square value={squares[1]} onSquareClick={() => handleClick(1)} />
@@ -50,3 +58,23 @@ const Board = ({ value }) => {
 };
 
 export default Board;
+
+function calculateWinner(squares) {
+  const lines = [
+    [0, 1, 2],
+    [3, 4, 5],
+    [6, 7, 8],
+    [0, 3, 6],
+    [1, 4, 7],
+    [2, 5, 8],
+    [0, 4, 8],
+    [2, 4, 6],
+  ];
+  for (let i = 0; i < lines.length; i++) {
+    const [a, b, c] = lines[i];
+    if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
+      return squares[a];
+    }
+  }
+  return null;
+}
