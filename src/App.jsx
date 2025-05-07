@@ -11,9 +11,7 @@ function Square({ value, onSquareClick }) {
   );
 }
 
-const Board = ({ value }) => {
-  const [squares, setSquares] = useState(Array(9).fill(null));
-  const [xIsNext, setXIsNext] = useState(true);
+const Board = ({ xIsNext, squares, onPlay }) => {
   const winner = calculateWinner(squares);
   let status;
   if (winner) {
@@ -31,8 +29,7 @@ const Board = ({ value }) => {
     } else {
       nextSquares[i] = "O";
     }
-    setSquares(nextSquares);
-    setXIsNext(!xIsNext);
+    onPlay(nextSquares);
   }
 
   return (
@@ -57,7 +54,50 @@ const Board = ({ value }) => {
   );
 };
 
-export default Board;
+function Game() {
+  const [history, setHistory] = useState([Array(9).fill(null)]);
+  const [xIsNext, setXIsNext] = useState(true);
+  const [currentMove, setCurrentMove] = useState(0);
+  const currentSquares = history[currentMove];
+
+  function handlePlay(nextSquares) {
+    setXIsNext(!xIsNext);
+    const nextHistory = [...history.slice(0, currentMove + 1), nextSquares];
+    setHistory(nextHistory);
+    setCurrentMove(nextHistory.length - 1);
+  }
+  function jumpTo(move) {
+    setCurrentMove(move);
+    setXIsNext(move % 2 === 0);
+  }
+  const moves = history.map((squares, move) => {
+    let description;
+    if (move > 0) {
+      description = `Go to the # ${move}`;
+    } else {
+      description = `Go to start the game`;
+    }
+    return (
+      <li key={move} className="bg-gray-800 text-white mb-4 rounded p-2">
+        <button className="cursor-pointer" onClick={() => jumpTo(move)}>
+          {description}
+        </button>
+      </li>
+    );
+  });
+
+  return (
+    <div className="flex justify-center space-x-10">
+      <div>
+        <Board xIsNext={xIsNext} squares={currentSquares} onPlay={handlePlay} />
+      </div>
+      <div className="border border-amber-300 p-2 mt-5 rounded-sm">
+        <ol className="text-3xl font-semibold text-center  ">{moves}</ol>
+      </div>
+    </div>
+  );
+}
+export default Game;
 
 function calculateWinner(squares) {
   const lines = [
