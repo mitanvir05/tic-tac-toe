@@ -16,6 +16,8 @@ const Board = ({ xIsNext, squares, onPlay }) => {
   let status;
   if (winner) {
     status = `Winner :  ${winner}`;
+  } else if (squares.every((square) => square !== null)) {
+    status = "Game Draw!";
   } else {
     status = "Next Player : " + (xIsNext ? "X" : "O");
   }
